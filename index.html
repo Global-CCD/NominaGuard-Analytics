@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NominaGuard Analytics - Risk Calculator</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --text-main: #334155;
+            --bg-light: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --critical: #991b1b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #e2e8f0;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin: 20px;
+        }
+
+        .header {
+            background-color: var(--primary);
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            margin: 8px 0 0 0;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: var(--bg-light);
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+        }
+
+        /* Results Section */
+        #results {
+            display: none;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.5s;
+        }
+
+        .risk-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .brief {
+            background-color: var(--bg-light);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            text-align: left;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .cost-comparison {
+            display: flex;
+            justify-content: space-between;
+            background-color: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .cost-col {
+            flex: 1;
+        }
+        
+        .cost-col:first-child {
+            border-right: 1px solid #cbd5e1;
+            margin-right: 15px;
+        }
+        
+        .cost-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+        .cost-red { color: var(--danger); }
+        .cost-green { color: var(--success); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>NominaGuard Analytics</h1>
+            <p>Predict, Protect, and Secure Your Digital Identity.</p>
+        </div>
+
+        <div class="content">
+            <form id="riskForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" placeholder="e.g. Jane Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="profession">Profession / Industry Profile</label>
+                    <select id="profession" required>
+                        <option value="40">Medical, Legal, or Financial (High Net Worth/Trust)</option>
+                        <option value="35">Executive, Founder, C-Suite (BEC Target)</option>
+                        <option value="30">Creative, Public Figure, Politician (Brand Target)</option>
+                        <option value="15">General Corporate Professional / IT</option>
+                        <option value="5">Student / Local Tradesperson / Private</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="stage">Age / Career Stage</label>
+                    <select id="stage" required>
+                        <option value="10">Under 22 (Blank Slate / Trainee)</option>
+                        <option value="20">22-30 (Emerging Professional / The Danger Zone)</option>
+                        <option value="15">31-45 (Mid-Career / Rising Value)</option>
+                        <option value="25">45+ (Senior / Partner / Peak Extortion Value)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="jurisdiction">Legal Jurisdiction (Affects Recovery Rules)</label>
+                    <select id="jurisdiction" required>
+                        <option value="US">USA (UDRP/ACPA - Very Hostile to Personal Names)</option>
+                        <option value="UK">United Kingdom (Nominet - Hostile to Personal Names)</option>
+                        <option value="IE">Ireland (IEDR - Moderate Protection)</option>
+                        <option value="EU">European Union (euADR - Moderate Protection)</option>
+                        <option value="CA">Canada (CIRA - Good Protection)</option>
+                    </select>
+                </div>
+
+                <button type="submit">Calculate Personal Risk Matrix</button>
+            </form>
+
+            <div id="results">
+                <div class="score-circle" id="scoreCircle">0</div>
+                <div class="risk-label" id="riskLabel">CALCULATING...</div>
+                
+                <div class="brief" id="briefText">
+                    <!-- Dynamic text will populate here -->
+                </div>
+
+                <div class="cost-comparison">
+                    <div class="cost-col">
+                        <div>Cost to Secure Today:</div>
+                        <div class="cost-value cost-green" id="protectCost">€20 / year</div>
+                    </div>
+                    <div class="cost-col">
+                        <div>Est. Cost to Recover:</div>
+                        <div class="cost-value cost-red" id="recoverCost">€4,500+</div>
+                    </div>
+                </div>
+                
+                <button style="background-color: #0f172a; margin-top: 20px;" onclick="location.reload()">Reset Assessment</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('riskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // 1. Gather Inputs
+            const name = document.getElementById('fullName').value;
+            const profScore = parseInt(document.getElementById('profession').value);
+            const profText = document.getElementById('profession').options[document.getElementById('profession').selectedIndex].text;
+            const stageScore = parseInt(document.getElementById('stage').value);
+            const jurisVal = document.getElementById('jurisdiction').value;
+
+            // 2. Base Matrix Logic
+            let baseScore = 10; // Everyone has a baseline risk
+            let jurisScore = 0;
+            let recoveryCostText = "";
+            let protectCostText = "";
+            let jurisBrief = "";
+
+            // Jurisdiction specific logic
+            switch(jurisVal) {
+                case 'US':
+                    jurisScore = 25;
+                    protectCostText = "$15 / year";
+                    recoveryCostText = "$100,000+ (ACPA)";
+                    jurisBrief = "the USA (UDRP), ordinary personal names have virtually no trademark protection unless you sue in federal court.";
+                    break;
+                case 'UK':
+                    jurisScore = 25;
+                    protectCostText = "£10 / year";
+                    recoveryCostText = "£5,000+ (Nominet)";
+                    jurisBrief = "the UK, Nominet explicitly protects 'criticism' sites, meaning anyone can buy your name for negative campaigns without commercial use.";
+                    break;
+                case 'IE':
+                    jurisScore = 15;
+                    protectCostText = "€25 / year";
+                    recoveryCostText = "€4,500+ (IEDR/WIPO)";
+                    jurisBrief = "Ireland, your name is moderately protected, but the cost to trigger a WIPO IEDR dispute requires expensive legal solicitor fees.";
+                    break;
+                case 'EU':
+                    jurisScore = 15;
+                    protectCostText = "€15 / year";
+                    recoveryCostText = "€4,000+ (euADR)";
+                    jurisBrief = "the EU, while Regulation 874/2004 protects personal names, the EURid ADR process is costly and legally complex.";
+                    break;
+                case 'CA':
+                    jurisScore = 15;
+                    protectCostText = "$15 CAD / year";
+                    recoveryCostText = "$7,000+ CAD (CIRA)";
+                    jurisBrief = "Canada, CIRA protects personal names, but proving 'bad faith' against a squatter still requires an expensive tribunal proceeding.";
+                    break;
+            }
+
+            // Calculate final PDRM Score (Max ~100)
+            let totalScore = baseScore + profScore + stageScore + jurisScore;
+            if (totalScore > 100) totalScore = 100;
+
+            // 3. UI Update Logic
+            const resultsDiv = document.getElementById('results');
+            const scoreCircle = document.getElementById('scoreCircle');
+            const riskLabel = document.getElementById('riskLabel');
+            const briefText = document.getElementById('briefText');
+            
+            // Determine Risk Tier Colors and Labels
+            let color, label;
+            if (totalScore >= 80) {
+                color = "var(--critical)";
+                label = "CRITICAL VULNERABILITY";
+            } else if (totalScore >= 60) {
+                color = "var(--danger)";
+                label = "HIGH RISK";
+            } else if (totalScore >= 40) {
+                color = "var(--warning)";
+                label = "MODERATE RISK";
+            } else {
+                color = "var(--success)";
+                label = "LOW RISK";
+            }
+
+            // Update DOM Elements
+            scoreCircle.innerText = totalScore;
+            scoreCircle.style.backgroundColor = color;
+            riskLabel.innerText = label;
+            riskLabel.style.color = color;
+
+            document.getElementById('protectCost').innerText = protectCostText;
+            document.getElementById('recoverCost').innerText = recoveryCostText;
+
+            // Generate Personalized Brief
+            briefText.innerHTML = `<strong>Identity Analysis for ${name}:</strong><br><br>
+            As someone in the <em>${profText.split('(')[0].trim()}</em> category, your digital identity is heavily tied to your net-worth and public trust. Squatters actively use automated bots to scrape public professional registries to buy domain names matching profiles exactly like yours.<br><br>
+            Furthermore, because you are located in <strong>${jurisBrief}</strong><br><br>
+            <em>Recommendation: Pre-emptive registration of your exact-match .com and local TLD is highly recommended before career advancement triggers a squatting event.</em>`;
+
+            // Reveal Results
+            resultsDiv.style.display = "block";
+            
+            // Scroll to results softly
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
